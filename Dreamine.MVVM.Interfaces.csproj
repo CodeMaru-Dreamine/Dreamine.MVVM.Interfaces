@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <PackageId>Dreamine.MVVM.Interfaces</PackageId>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>Dreamine Core Team</Authors>
     <Company>Dreamine</Company>
     <Description>Dreamine MVVM 프레임워크에서 사용하는 핵심 인터페이스 모음입니다. DI, 이벤트, 커맨드, Navigation 등을 정의합니다.</Description>
