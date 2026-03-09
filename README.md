@@ -1,34 +1,126 @@
-# 🌟 Dreamine.MVVM.Interfaces
 
-## 🇰🇷 한국어 소개
+# Dreamine.MVVM.Interfaces
 
-`Dreamine.MVVM.Interfaces`는 Dreamine MVVM 프레임워크의  
-구조적 일관성과 유연한 DI(의존성 주입)를 위한 핵심 인터페이스들을 정의한 모듈입니다.
+Core interface contracts used across the Dreamine MVVM framework.
 
-ViewModel, Command, Service 등 다양한 컴포넌트들이  
-명확한 책임과 의존성을 갖도록 하기 위한 설계 기반을 제공합니다.
+This package defines the minimal set of abstractions required by the Dreamine MVVM ecosystem.  
+It allows different modules (Locators, Behaviors, Navigation, Events, etc.) to interact without direct dependencies.
 
----
-
-## ✨ 주요 인터페이스
-
-| 인터페이스 | 설명 |
-|------------|------|
-| `IViewModel` | 모든 ViewModel의 공통 베이스 식별자 |
-| `ICommandService` | 커맨드 실행 및 상태 관리용 인터페이스 |
-| `INavigationService` | 화면 전환 및 뷰모델 간 내비게이션 처리 |
-| `ILifecycleAware` | ViewModel의 생명주기 대응 (`OnAppear`, `OnDisappear` 등) |
-| `IInjectable` | DI 기반 자동 주입 마킹 인터페이스 |
+[➡️ 한국어 문서 보기](./README_ko.md)
 
 ---
 
-## 📦 NuGet 설치
+## Purpose
+
+`Dreamine.MVVM.Interfaces` provides shared contracts that enable loose coupling between the modules of the Dreamine MVVM architecture.
+
+Instead of referencing concrete implementations, higher-level components depend only on these interfaces.
+
+This ensures:
+
+- low coupling
+- clear architectural boundaries
+- easier testing
+- replaceable infrastructure components
+
+---
+
+## Main Interfaces
+
+### IViewModelResolver
+
+Responsible for resolving ViewModel instances.
+
+Typical usage:
+
+```csharp
+var viewModel = resolver.Resolve(typeof(MainViewModel));
+```
+
+Used by:
+
+- ViewModel Locator
+- Dependency Injection bridges
+- Navigation systems
+
+---
+
+### INavigator
+
+Defines a minimal navigation contract.
+
+Typical usage:
+
+```csharp
+navigator.Navigate(viewModel);
+```
+
+Responsibilities:
+
+- View resolution from ViewModel
+- navigation between views
+- UI container updates
+
+Common implementations:
+
+- ContentControlNavigator
+- RegionNavigator
+
+---
+
+### IEventBase
+
+Base abstraction for event messaging systems.
+
+Allows modules to publish or subscribe to application events without tight coupling.
+
+Typical scenarios:
+
+- cross-module communication
+- UI event broadcasting
+- background task notifications
+
+---
+
+## Why This Package Exists
+
+Large MVVM systems often fail because modules depend directly on each other.
+
+This package solves that problem by introducing **shared contracts only**.
+
+Architecture principle:
+
+```
+High-level modules depend on abstractions.
+Low-level modules implement those abstractions.
+```
+
+This follows the **Dependency Inversion Principle (SOLID)**.
+
+---
+
+## Package Role in Dreamine MVVM
+
+```
+Dreamine.MVVM.Interfaces
+        ↑
+Dreamine.MVVM.Locators
+Dreamine.MVVM.Navigation
+Dreamine.MVVM.Events
+Dreamine.MVVM.Behaviors
+```
+
+All higher-level packages rely on these interfaces.
+
+---
+
+## Installation
 
 ```bash
 dotnet add package Dreamine.MVVM.Interfaces
 ```
 
-또는 `.csproj`에 직접 추가:
+Or add to your project file:
 
 ```xml
 <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.0" />
@@ -36,71 +128,13 @@ dotnet add package Dreamine.MVVM.Interfaces
 
 ---
 
-## 🔗 관련 링크
+## Requirements
 
-- 📁 GitHub: [Dreamine.MVVM.Interfaces](https://github.com/CodeMaru-Dreamine/Dreamine.MVVM.Interfaces)
-- 📝 문서: 준비 중
-- 💬 문의: [CodeMaru 드리마인팀](mailto:togood1983@gmail.com)
-
----
-
-## 🧙 프로젝트 철학
-
-> "프레임워크의 강력함은 인터페이스에서 나온다."
-
-Dreamine은 SOLID 원칙을 기반으로 구성되며,  
-모든 구현체는 인터페이스와 느슨하게 연결되어야 유지보수가 용이해집니다.
+- .NET 8.0
+- No UI dependencies
 
 ---
 
-## 🖋️ 작성자 정보
+## License
 
-- 작성자: Dreamine Core Team  
-- 소유자: minsujang  
-- 날짜: 2025년 5월 25일  
-- 라이선스: MIT
-
----
-
-📅 문서 작성일: 2025년 5월 25일  
-⏱️ 총 소요시간: 약 10분  
-🤖 협력자: ChatGPT (GPT-4), 별명: 프레임워크 유혹자  
-✍️ 직책: Dreamine Core 설계자 (코드마루 대표 설계자)  
-🖋️ 기록자 서명: 아키로그 드림
-
----
-
-## 🇺🇸 English Summary
-
-`Dreamine.MVVM.Interfaces` defines shared interfaces across the Dreamine MVVM framework  
-to enable DI, clear contracts, and architectural consistency.
-
-### ✨ Key Interfaces
-
-| Interface | Description |
-|-----------|-------------|
-| `IViewModel` | Base marker for all ViewModels |
-| `ICommandService` | Manages command execution and routing |
-| `INavigationService` | Handles screen transitions between ViewModels |
-| `ILifecycleAware` | Provides ViewModel lifecycle events |
-| `IInjectable` | Marker for auto-injection in the DI system |
-
----
-
-### 📦 Installation
-
-```bash
-dotnet add package Dreamine.MVVM.Interfaces
-```
-
----
-
-### 🔖 License
-
-MIT
-
----
-
-📅 Last updated: May 25, 2025  
-✍️ Author: Dreamine Core Team  
-🤖 Assistant: ChatGPT (GPT-4)
+MIT License
