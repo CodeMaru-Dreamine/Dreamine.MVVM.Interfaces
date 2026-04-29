@@ -1,115 +1,236 @@
+<!--!
+\file README_ko.md
+\brief Dreamine.MVVM.Interfaces - Dreamine MVVM 모듈을 위한 공유 추상 계약 패키지.
+\details 구체 런타임 구현 없이 의존성 주입, 객체 생성, 자동 등록, ViewModel 해석, 내비게이션, 이벤트 계약을 정의합니다.
+\author Dreamine Core Team
+\date 2026-04-29
+\version 1.0.5
+-->
 
 # Dreamine.MVVM.Interfaces
 
-Dreamine MVVM 프레임워크 전체에서 사용하는 **공통 인터페이스 계약(Interface Contracts)** 패키지입니다.
+**Dreamine.MVVM.Interfaces**는 Dreamine MVVM 프레임워크 전반에서 사용하는 공유 추상 계약을 정의합니다.
 
-이 패키지는 Dreamine MVVM 생태계에서 필요한 최소한의 인터페이스들을 정의합니다.  
-Locator, Navigation, Events, Behaviors 등의 모듈이 서로 직접 의존하지 않도록 설계되었습니다.
+이 패키지는 계약만 포함합니다. 구체 의존성 컨테이너, WPF 내비게이션 구현체, ViewModel Locator 구현체, 런타임 객체 생성 로직은 제공하지 않습니다.
+
+이 패키지의 목적은 Dreamine 모듈 간 결합도를 낮추고 프레임워크 레이어 사이의 올바른 의존성 방향을 유지하는 것입니다.
 
 [➡️ English Version](./README.md)
 
 ---
 
-## 목적
+## 이 라이브러리가 제공하는 것
 
-`Dreamine.MVVM.Interfaces`는 Dreamine MVVM 아키텍처에서 모듈 간 결합도를 낮추기 위한 공통 인터페이스를 제공합니다.
+Dreamine.MVVM.Interfaces는 다음 계약을 제공합니다.
 
-구현체에 직접 의존하는 대신 **인터페이스에 의존하도록 구조를 분리**합니다.
-
-이를 통해 다음과 같은 효과를 얻을 수 있습니다.
-
-- 모듈 간 낮은 결합도
-- 명확한 아키텍처 경계
-- 테스트 용이성
-- 인프라 교체 가능성
+- 의존성 등록
+- 의존성 해석
+- 서비스 컨테이너 구성
+- 생성자 선택
+- 객체 생성
+- Assembly 타입 스캔
+- 자동 등록
+- ViewModel 해석
+- 내비게이션
+- 이벤트 기본 마커
 
 ---
 
-## 주요 인터페이스
+## 패키지 역할
+
+`Dreamine.MVVM.Interfaces`는 가장 낮은 레벨의 공유 계약 패키지로 유지되어야 합니다.
+
+권장 의존성 방향은 다음과 같습니다.
+
+```text
+Dreamine.MVVM.Interfaces
+        ↑
+Dreamine.MVVM.Core
+        ↑
+Dreamine.MVVM.Locators / Dreamine.MVVM.Wpf / Application modules
+```
+
+규칙:
+
+- `Dreamine.MVVM.Interfaces`는 `Dreamine.MVVM.Core`에 의존하면 안 됩니다.
+- `Dreamine.MVVM.Interfaces`는 WPF 전용 패키지에 의존하면 안 됩니다.
+- 구현체는 상위 레벨 패키지에 위치해야 합니다.
+- 소비자는 필요한 최소 인터페이스에만 의존해야 합니다.
+
+---
+
+## 프로젝트 구조
+
+```text
+Dreamine.MVVM.Interfaces
+├── DependencyInjection
+│   ├── IAssemblyTypeScanner.cs
+│   ├── IAutoRegistrationService.cs
+│   ├── IConstructorSelector.cs
+│   ├── IObjectActivator.cs
+│   ├── IServiceContainer.cs
+│   ├── IServiceRegistry.cs
+│   └── IServiceResolver.cs
+├── Events
+│   └── IEventBase.cs
+├── Locators
+│   └── IViewModelResolver.cs
+└── Navigation
+    └── INavigator.cs
+```
+
+---
+
+## 의존성 주입 계약
+
+### IServiceRegistry
+
+서비스 등록 작업을 정의합니다.
+
+지원하는 등록 개념:
+
+- Transient 구체 타입 등록
+- Transient 추상화-구현체 등록
+- 팩토리 등록
+- 싱글턴 인스턴스 등록
+- 싱글턴 구체 타입 등록
+- 싱글턴 추상화-구현체 등록
+- 등록 여부 확인
+
+구현체 사용 예:
+
+```csharp
+registry.Register<IMyService, MyService>();
+registry.RegisterSingleton<ISharedState, SharedState>();
+```
+
+---
+
+### IServiceResolver
+
+서비스 해석 작업을 정의합니다.
+
+```csharp
+TService service = resolver.Resolve<TService>();
+object service = resolver.Resolve(typeof(TService));
+```
+
+---
+
+### IServiceContainer
+
+`IServiceRegistry`와 `IServiceResolver`를 결합합니다.
+
+등록과 해석이 모두 필요한 컴포넌트에서만 사용하는 것이 좋습니다.
+
+인터페이스 분리 원칙을 유지하려면 다음 기준을 따릅니다.
+
+- 등록만 필요하면 `IServiceRegistry`에 의존
+- 해석만 필요하면 `IServiceResolver`에 의존
+
+---
+
+### IConstructorSelector
+
+객체 생성 시 사용할 생성자를 선택합니다.
+
+구현체는 다음과 같은 정책을 사용할 수 있습니다.
+
+- 파라미터 수가 가장 많은 생성자 선택
+- 명시적 Attribute 기반 선택
+- 파라미터 해석 가능 여부 기반 선택
+
+---
+
+### IObjectActivator
+
+생성자 주입을 사용해 객체 인스턴스를 생성합니다.
+
+`IServiceResolver`를 전달받기 때문에 구체 컨테이너에 직접 의존하지 않고 생성자 의존성을 해석할 수 있습니다.
+
+---
+
+### IAssemblyTypeScanner
+
+Assembly를 스캔하고 로드 가능한 타입을 반환합니다.
+
+부분적으로만 로드 가능한 Assembly나 `ReflectionTypeLoadException` 상황을 구현체가 안전하게 처리할 수 있도록 분리된 계약입니다.
+
+---
+
+### IAutoRegistrationService
+
+규칙 기반 자동 등록 계약을 정의합니다.
+
+구현체가 결정하는 영역:
+
+- 어떤 Assembly를 스캔할지
+- 어떤 타입을 등록 대상으로 볼지
+- 어떤 수명 정책을 적용할지
+
+---
+
+## Locator 계약
 
 ### IViewModelResolver
 
-ViewModel 인스턴스를 생성하거나 가져오는 역할을 담당합니다.
-
-사용 예시:
+최소 ViewModel 해석 전략을 정의합니다.
 
 ```csharp
-var viewModel = resolver.Resolve(typeof(MainViewModel));
+object? viewModel = resolver.Resolve(typeof(MainWindowViewModel));
 ```
 
-사용되는 영역:
+대표 구현체:
 
-- ViewModel Locator
-- DI 컨테이너 연결
-- Navigation 시스템
+- DI 기반 ViewModel Resolver
+- 수동 팩토리 Resolver
+- 테스트용 Resolver
 
 ---
 
+## Navigation 계약
+
 ### INavigator
 
-화면 이동을 위한 최소한의 네비게이션 계약 인터페이스입니다.
-
-사용 예시:
+Dreamine 내비게이션 구현체에서 사용하는 최소 내비게이션 계약입니다.
 
 ```csharp
 navigator.Navigate(viewModel);
 ```
 
-역할:
-
-- ViewModel → View 변환
-- 화면 이동 처리
-- UI 컨테이너 업데이트
-
-대표 구현 예:
-
-- ContentControlNavigator
-- RegionNavigator
+`INavigator`는 WPF UI 타입에 의존하지 않도록 object ViewModel을 받습니다. 구체 내비게이션 동작은 WPF 전용 패키지에 위치해야 합니다.
 
 ---
+
+## Event 계약
 
 ### IEventBase
 
-이벤트 메시징 시스템을 위한 기본 인터페이스입니다.
+Dreamine Event 클래스의 마커 인터페이스입니다.
 
-모듈 간 직접 참조 없이 이벤트를 전달할 수 있도록 합니다.
-
-사용 사례:
-
-- 모듈 간 통신
-- UI 이벤트 전달
-- 백그라운드 작업 알림
+Source Generator, Scanner, Framework Convention이 구체 의존성 없이 Event 객체를 식별하는 데 사용할 수 있습니다.
 
 ---
 
-## 이 패키지가 필요한 이유
+## 설계 목표
 
-대규모 MVVM 프로젝트는 모듈 간 의존성이 강해지면 구조가 무너지기 쉽습니다.
+Dreamine.MVVM.Interfaces는 다음을 우선합니다.
 
-`Dreamine.MVVM.Interfaces`는 **공통 인터페이스만 제공하는 레이어**를 만들어 이 문제를 해결합니다.
-
-아키텍처 원칙:
-
-```
-상위 모듈은 구현이 아니라 추상화에 의존한다.
-```
-
-이는 **SOLID 원칙 중 Dependency Inversion Principle**을 따르는 구조입니다.
+- 의존성 역전
+- 인터페이스 분리
+- 모듈 간 낮은 결합도
+- 테스트 가능한 인프라 경계
+- UI 프레임워크 독립성
+- 교체 가능한 구현체
+- Core, Locators, WPF, 애플리케이션 모듈을 위한 안정적인 계약
 
 ---
 
-## Dreamine MVVM 구조 내 위치
+## 요구사항
 
-```
-Dreamine.MVVM.Interfaces
-        ↑
-Dreamine.MVVM.Locators
-Dreamine.MVVM.Navigation
-Dreamine.MVVM.Events
-Dreamine.MVVM.Behaviors
-```
-
-상위 레이어 모듈들은 모두 이 인터페이스 패키지를 기반으로 동작합니다.
+- **.NET**: `net8.0`
+- WPF 의존성 없음
+- 구체 런타임 구현 의존성 없음
 
 ---
 
@@ -122,15 +243,23 @@ dotnet add package Dreamine.MVVM.Interfaces
 또는 프로젝트 파일에 직접 추가합니다.
 
 ```xml
-<PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.0" />
+<ItemGroup>
+  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.4" />
+</ItemGroup>
 ```
 
 ---
 
-## 요구 사항
+## 관련 모듈
 
-- .NET 8.0
-- UI 의존성 없음
+대표 구현체 및 소비 모듈:
+
+- `Dreamine.MVVM.Core`
+- `Dreamine.MVVM.Locators`
+- `Dreamine.MVVM.Locators.Wpf`
+- `Dreamine.MVVM.Wpf`
+- `Dreamine.MVVM.Behaviors.Core`
+- `Dreamine.MVVM.Behaviors.Wpf`
 
 ---
 

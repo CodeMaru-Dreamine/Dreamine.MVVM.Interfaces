@@ -1,116 +1,236 @@
+<!--!
+\file README.md
+\brief Dreamine.MVVM.Interfaces - Shared abstraction contracts for Dreamine MVVM modules.
+\details Defines dependency injection, object activation, auto-registration, ViewModel resolution, navigation, and event contracts without concrete runtime implementation.
+\author Dreamine Core Team
+\date 2026-04-29
+\version 1.0.5
+-->
 
 # Dreamine.MVVM.Interfaces
 
-Core interface contracts used across the Dreamine MVVM framework.
+**Dreamine.MVVM.Interfaces** defines shared abstraction contracts used across the Dreamine MVVM framework.
 
-This package defines the minimal set of abstractions required by the Dreamine MVVM ecosystem.  
-It allows different modules (Locators, Behaviors, Navigation, Events, etc.) to interact without direct dependencies.
+This package contains contracts only. It does not provide concrete dependency injection containers, WPF navigation implementations, ViewModel locators, or runtime object creation logic.
+
+The purpose of this package is to keep Dreamine modules loosely coupled and to preserve clean dependency direction between framework layers.
 
 [➡️ 한국어 문서 보기](./README_ko.md)
 
 ---
 
-## Purpose
+## What this library provides
 
-`Dreamine.MVVM.Interfaces` provides shared contracts that enable loose coupling between the modules of the Dreamine MVVM architecture.
+Dreamine.MVVM.Interfaces provides contracts for:
 
-Instead of referencing concrete implementations, higher-level components depend only on these interfaces.
-
-This ensures:
-
-- low coupling
-- clear architectural boundaries
-- easier testing
-- replaceable infrastructure components
+- dependency registration
+- dependency resolution
+- service container composition
+- constructor selection
+- object activation
+- assembly type scanning
+- auto-registration
+- ViewModel resolution
+- navigation
+- event base markers
 
 ---
 
-## Main Interfaces
+## Package Role
+
+`Dreamine.MVVM.Interfaces` should remain the lowest-level shared contract package.
+
+Recommended dependency direction:
+
+```text
+Dreamine.MVVM.Interfaces
+        ↑
+Dreamine.MVVM.Core
+        ↑
+Dreamine.MVVM.Locators / Dreamine.MVVM.Wpf / Application modules
+```
+
+Rules:
+
+- `Dreamine.MVVM.Interfaces` must not depend on `Dreamine.MVVM.Core`.
+- `Dreamine.MVVM.Interfaces` must not depend on WPF-specific packages.
+- Implementations should live in higher-level packages.
+- Consumers should depend on the smallest interface they need.
+
+---
+
+## Project Structure
+
+```text
+Dreamine.MVVM.Interfaces
+├── DependencyInjection
+│   ├── IAssemblyTypeScanner.cs
+│   ├── IAutoRegistrationService.cs
+│   ├── IConstructorSelector.cs
+│   ├── IObjectActivator.cs
+│   ├── IServiceContainer.cs
+│   ├── IServiceRegistry.cs
+│   └── IServiceResolver.cs
+├── Events
+│   └── IEventBase.cs
+├── Locators
+│   └── IViewModelResolver.cs
+└── Navigation
+    └── INavigator.cs
+```
+
+---
+
+## Dependency Injection Contracts
+
+### IServiceRegistry
+
+Defines service registration operations.
+
+Supported registration concepts:
+
+- transient concrete registration
+- transient abstraction-to-implementation registration
+- factory registration
+- singleton instance registration
+- singleton concrete registration
+- singleton abstraction-to-implementation registration
+- registration existence checks
+
+Example implementation usage:
+
+```csharp
+registry.Register<IMyService, MyService>();
+registry.RegisterSingleton<ISharedState, SharedState>();
+```
+
+---
+
+### IServiceResolver
+
+Defines service resolution operations.
+
+```csharp
+TService service = resolver.Resolve<TService>();
+object service = resolver.Resolve(typeof(TService));
+```
+
+---
+
+### IServiceContainer
+
+Combines `IServiceRegistry` and `IServiceResolver`.
+
+Use this only when a component genuinely needs both registration and resolution capabilities.
+
+For better interface segregation:
+
+- depend on `IServiceRegistry` when only registration is needed
+- depend on `IServiceResolver` when only resolution is needed
+
+---
+
+### IConstructorSelector
+
+Selects the constructor used during object activation.
+
+Concrete implementations may choose constructors by policy, for example:
+
+- largest parameter count
+- explicit attribute
+- parameter resolvability
+
+---
+
+### IObjectActivator
+
+Creates object instances using constructor injection.
+
+It receives an `IServiceResolver` so constructor dependencies can be resolved without directly depending on a concrete container.
+
+---
+
+### IAssemblyTypeScanner
+
+Scans assemblies and returns loadable types.
+
+This allows implementations to safely handle partially loadable assemblies and `ReflectionTypeLoadException` scenarios.
+
+---
+
+### IAutoRegistrationService
+
+Defines the contract for convention-based auto-registration.
+
+Concrete implementations decide:
+
+- which assemblies are scanned
+- which types are eligible
+- which lifetime policy is applied
+
+---
+
+## Locator Contract
 
 ### IViewModelResolver
 
-Responsible for resolving ViewModel instances.
-
-Typical usage:
+Defines a minimal ViewModel resolution strategy.
 
 ```csharp
-var viewModel = resolver.Resolve(typeof(MainViewModel));
+object? viewModel = resolver.Resolve(typeof(MainWindowViewModel));
 ```
 
-Used by:
+Typical implementers:
 
-- ViewModel Locator
-- Dependency Injection bridges
-- Navigation systems
+- DI-backed ViewModel resolver
+- manual factory resolver
+- test resolver
 
 ---
 
+## Navigation Contract
+
 ### INavigator
 
-Defines a minimal navigation contract.
-
-Typical usage:
+Defines the minimal navigation contract used by Dreamine navigation implementations.
 
 ```csharp
 navigator.Navigate(viewModel);
 ```
 
-Responsibilities:
-
-- View resolution from ViewModel
-- navigation between views
-- UI container updates
-
-Common implementations:
-
-- ContentControlNavigator
-- RegionNavigator
+`INavigator` intentionally accepts an object ViewModel to keep the contract independent from WPF UI types. Concrete navigation behavior belongs to WPF-specific packages.
 
 ---
+
+## Event Contract
 
 ### IEventBase
 
-Base abstraction for event messaging systems.
+Marker interface for Dreamine event classes.
 
-Allows modules to publish or subscribe to application events without tight coupling.
-
-Typical scenarios:
-
-- cross-module communication
-- UI event broadcasting
-- background task notifications
+It can be used by source generators, scanners, or framework conventions to identify event objects without introducing concrete dependencies.
 
 ---
 
-## Why This Package Exists
+## Design Goals
 
-Large MVVM systems often fail because modules depend directly on each other.
+Dreamine.MVVM.Interfaces prioritizes:
 
-This package solves that problem by introducing **shared contracts only**.
-
-Architecture principle:
-
-```
-High-level modules depend on abstractions.
-Low-level modules implement those abstractions.
-```
-
-This follows the **Dependency Inversion Principle (SOLID)**.
+- dependency inversion
+- interface segregation
+- low coupling between modules
+- testable infrastructure boundaries
+- UI-framework independence
+- replaceable implementations
+- stable contracts for Core, Locators, WPF, and application modules
 
 ---
 
-## Package Role in Dreamine MVVM
+## Requirements
 
-```
-Dreamine.MVVM.Interfaces
-        ↑
-Dreamine.MVVM.Locators
-Dreamine.MVVM.Navigation
-Dreamine.MVVM.Events
-Dreamine.MVVM.Behaviors
-```
-
-All higher-level packages rely on these interfaces.
+- **.NET**: `net8.0`
+- No WPF dependency
+- No concrete runtime implementation dependency
 
 ---
 
@@ -123,15 +243,23 @@ dotnet add package Dreamine.MVVM.Interfaces
 Or add to your project file:
 
 ```xml
-<PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.0" />
+<ItemGroup>
+  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.4" />
+</ItemGroup>
 ```
 
 ---
 
-## Requirements
+## Related Modules
 
-- .NET 8.0
-- No UI dependencies
+Typical implementations and consumers:
+
+- `Dreamine.MVVM.Core`
+- `Dreamine.MVVM.Locators`
+- `Dreamine.MVVM.Locators.Wpf`
+- `Dreamine.MVVM.Wpf`
+- `Dreamine.MVVM.Behaviors.Core`
+- `Dreamine.MVVM.Behaviors.Wpf`
 
 ---
 
