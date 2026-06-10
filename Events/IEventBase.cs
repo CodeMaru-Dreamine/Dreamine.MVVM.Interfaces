@@ -1,9 +1,14 @@
-﻿
 namespace Dreamine.MVVM.Interfaces.Events
 {
-	/// <summary>
-	/// Dreamine에서 모든 Event 클래스의 기본 인터페이스입니다.
-	/// Source Generator 등 자동 연결의 기준점이 됩니다.
-	/// </summary>
-	public interface IEventBase { }
+    /// <summary>
+    /// Marks a type as an explicit Dreamine event contract.
+    /// </summary>
+    /// <remarks>
+    /// This marker is not intended to be a broad source-generation trigger by itself.
+    /// Generators and scanners should combine it with explicit Dreamine attributes,
+    /// naming rules, or namespace rules before treating a type as an automatic target.
+    /// </remarks>
+    public interface IEventBase
+    {
+    }
 }

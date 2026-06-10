@@ -3,9 +3,13 @@
 namespace Dreamine.MVVM.Interfaces.Navigation
 {
     /// <summary>
-    /// Provides View display operations based on ViewModel types.
+    /// Provides View display operations based on ViewModel instances or ViewModel types.
     /// </summary>
-    public interface IViewManager
+    /// <remarks>
+    /// This is the application-level View display contract. It extends <see cref="INavigator"/>
+    /// so instance-based and type-based display operations stay in one navigation contract family.
+    /// </remarks>
+    public interface IViewManager : INavigator
     {
         /// <summary>
         /// Shows the View that corresponds to the specified ViewModel type.

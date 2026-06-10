@@ -5,7 +5,7 @@ namespace Dreamine.MVVM.Interfaces.Windows
     /// <summary>
     /// Provides data for a window open-state changed event.
     /// </summary>
-    public sealed class WindowStateChangedEventArgs : EventArgs
+    public sealed class WindowStateChangedEventArgs : EventArgs, IWindowStateChange
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowStateChangedEventArgs"/> class.

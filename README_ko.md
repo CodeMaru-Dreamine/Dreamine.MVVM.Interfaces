@@ -33,6 +33,7 @@ Dreamine.MVVM.Interfaces는 다음 계약을 제공합니다.
 - ViewModel 해석
 - 내비게이션
 - 이벤트 기본 마커
+- Window 상태 payload 계약
 
 ---
 
@@ -75,8 +76,13 @@ Dreamine.MVVM.Interfaces
 │   └── IEventBase.cs
 ├── Locators
 │   └── IViewModelResolver.cs
-└── Navigation
-    └── INavigator.cs
+├── Navigation
+│   ├── INavigator.cs
+│   └── IViewManager.cs
+└── Windows
+    ├── IWindowStateChange.cs
+    ├── IWindowStateService.cs
+    └── WindowStateChangedEventArgs.cs
 ```
 
 ---
@@ -192,13 +198,25 @@ object? viewModel = resolver.Resolve(typeof(MainWindowViewModel));
 
 ### INavigator
 
-Dreamine 내비게이션 구현체에서 사용하는 최소 내비게이션 계약입니다.
+Dreamine region navigation 구현체에서 사용하는 최소 인스턴스 기반 내비게이션 계약입니다.
 
 ```csharp
 navigator.Navigate(viewModel);
 ```
 
 `INavigator`는 WPF UI 타입에 의존하지 않도록 object ViewModel을 받습니다. 구체 내비게이션 동작은 WPF 전용 패키지에 위치해야 합니다.
+
+### IViewManager
+
+더 넓은 View 표시 계약입니다. `INavigator`를 상속하고 타입 기반 ViewModel 해석을 추가합니다.
+
+```csharp
+viewManager.Show<MainViewModel>();
+viewManager.Show(typeof(MainViewModel));
+viewManager.Navigate(existingViewModel);
+```
+
+애플리케이션 레벨 View 표시는 `IViewManager`를 사용하고, region/content-control 기반 내비게이션만 필요할 때 `INavigator`를 사용합니다.
 
 ---
 
@@ -209,6 +227,22 @@ navigator.Navigate(viewModel);
 Dreamine Event 클래스의 마커 인터페이스입니다.
 
 Source Generator, Scanner, Framework Convention이 구체 의존성 없이 Event 객체를 식별하는 데 사용할 수 있습니다.
+
+이 마커만으로 자동 생성 대상을 결정하면 안 됩니다. 현재 Dreamine 생성기는 `[DreamineEvent]` 같은 명시적 Attribute를 기준으로 생성 후보를 고르며, scanner도 이 마커를 Attribute, namespace, naming rule과 함께 사용해야 합니다.
+
+---
+
+## Window 상태 계약
+
+### IWindowStateChange
+
+Window open-state 변경 payload 모양을 설명합니다.
+
+### IWindowStateService
+
+Window open/close 상태를 추적하고 `WindowStateChangedEventArgs`를 발생시킵니다.
+
+`WindowStateChangedEventArgs`는 `IWindowStateService` 계약의 일부라 이 패키지에 남겨두되, `IWindowStateChange`를 구현하게 해서 필요한 소비자는 payload 추상화에 의존할 수 있게 했습니다.
 
 ---
 

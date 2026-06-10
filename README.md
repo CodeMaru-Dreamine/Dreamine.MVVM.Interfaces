@@ -33,6 +33,7 @@ Dreamine.MVVM.Interfaces provides contracts for:
 - ViewModel resolution
 - navigation
 - event base markers
+- window state payload contracts
 
 ---
 
@@ -75,8 +76,13 @@ Dreamine.MVVM.Interfaces
 │   └── IEventBase.cs
 ├── Locators
 │   └── IViewModelResolver.cs
-└── Navigation
-    └── INavigator.cs
+├── Navigation
+│   ├── INavigator.cs
+│   └── IViewManager.cs
+└── Windows
+    ├── IWindowStateChange.cs
+    ├── IWindowStateService.cs
+    └── WindowStateChangedEventArgs.cs
 ```
 
 ---
@@ -192,13 +198,25 @@ Typical implementers:
 
 ### INavigator
 
-Defines the minimal navigation contract used by Dreamine navigation implementations.
+Defines the minimal instance-based navigation contract used by Dreamine region navigation implementations.
 
 ```csharp
 navigator.Navigate(viewModel);
 ```
 
 `INavigator` intentionally accepts an object ViewModel to keep the contract independent from WPF UI types. Concrete navigation behavior belongs to WPF-specific packages.
+
+### IViewManager
+
+Defines the broader View display contract. It extends `INavigator` and adds type-based ViewModel resolution.
+
+```csharp
+viewManager.Show<MainViewModel>();
+viewManager.Show(typeof(MainViewModel));
+viewManager.Navigate(existingViewModel);
+```
+
+Use `IViewManager` for application-level View display and `INavigator` only for region/content-control style navigation.
 
 ---
 
@@ -209,6 +227,22 @@ navigator.Navigate(viewModel);
 Marker interface for Dreamine event classes.
 
 It can be used by source generators, scanners, or framework conventions to identify event objects without introducing concrete dependencies.
+
+This marker should not be used as the only automatic-generation rule. Dreamine generators currently use explicit attributes such as `[DreamineEvent]` for generation candidates, and scanners should combine this marker with attributes, namespaces, or naming rules.
+
+---
+
+## Window State Contracts
+
+### IWindowStateChange
+
+Describes the payload shape for window open-state changes.
+
+### IWindowStateService
+
+Tracks window open/close state and raises `WindowStateChangedEventArgs`.
+
+`WindowStateChangedEventArgs` remains in this package because it is part of the `IWindowStateService` contract, but it also implements `IWindowStateChange` so consumers can depend on the payload abstraction where useful.
 
 ---
 
