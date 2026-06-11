@@ -21,5 +21,14 @@ namespace Dreamine.MVVM.Interfaces.DependencyInjection
         /// <param name="serviceType">The service type.</param>
         /// <returns>The resolved service instance.</returns>
         object Resolve(Type serviceType);
+
+        /// <summary>
+        /// Attempts to resolve an instance of the specified service type without throwing.
+        /// </summary>
+        /// <typeparam name="TService">The service type.</typeparam>
+        /// <param name="result">The resolved instance, or <c>null</c> if not registered.</param>
+        /// <returns><c>true</c> if resolved successfully; otherwise <c>false</c>.</returns>
+        bool TryResolve<TService>(out TService? result)
+            where TService : class;
     }
 }
