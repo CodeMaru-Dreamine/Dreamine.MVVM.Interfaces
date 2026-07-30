@@ -4,10 +4,23 @@
 \details 구체 런타임 구현 없이 의존성 주입, 객체 생성, 자동 등록, ViewModel 해석, 내비게이션, 이벤트 계약을 정의합니다.
 \author Dreamine Core Team
 \date 2026-04-29
-\version 1.0.5
+\version 1.0.7
 -->
 
 # Dreamine.MVVM.Interfaces
+
+[![CI](https://github.com/CodeMaru-Dreamine/Dreamine.MVVM.Interfaces/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeMaru-Dreamine/Dreamine.MVVM.Interfaces/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=coverage)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8-512BD4)](https://dotnet.microsoft.com/)
+[![NuGet](https://img.shields.io/nuget/v/Dreamine.MVVM.Interfaces.svg)](https://www.nuget.org/packages/Dreamine.MVVM.Interfaces)
+[![Downloads](https://img.shields.io/nuget/dt/Dreamine.MVVM.Interfaces.svg)](https://www.nuget.org/packages/Dreamine.MVVM.Interfaces)
+[![문서](https://img.shields.io/badge/문서-dreamine.kr-2CA5E0)](https://dreamine.kr)
+[![가이드](https://img.shields.io/badge/가이드-dreamine.kr-2CA5E0)](https://dreamine.kr)
+[![플레이그라운드](https://img.shields.io/badge/플레이그라운드-dreamine.kr-7B2CBF)](https://dreamine.kr)
+[![도서](https://img.shields.io/badge/도서-실전%20MVVM%20아키텍처-black)](https://dreamine.kr)
 
 **Dreamine.MVVM.Interfaces**는 Dreamine MVVM 프레임워크 전반에서 사용하는 공유 추상 계약을 정의합니다.
 
@@ -278,7 +291,7 @@ dotnet add package Dreamine.MVVM.Interfaces
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.4" />
+  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.7" />
 </ItemGroup>
 ```
 
