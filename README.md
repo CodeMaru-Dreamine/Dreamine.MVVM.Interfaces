@@ -4,10 +4,23 @@
 \details Defines dependency injection, object activation, auto-registration, ViewModel resolution, navigation, and event contracts without concrete runtime implementation.
 \author Dreamine Core Team
 \date 2026-04-29
-\version 1.0.5
+\version 1.0.7
 -->
 
 # Dreamine.MVVM.Interfaces
+
+[![CI](https://github.com/CodeMaru-Dreamine/Dreamine.MVVM.Interfaces/actions/workflows/ci.yml/badge.svg)](https://github.com/CodeMaru-Dreamine/Dreamine.MVVM.Interfaces/actions/workflows/ci.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces&metric=coverage)](https://sonarcloud.io/summary/new_code?id=CodeMaru-Dreamine_Dreamine.MVVM.Interfaces)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-8-512BD4)](https://dotnet.microsoft.com/)
+[![NuGet](https://img.shields.io/nuget/v/Dreamine.MVVM.Interfaces.svg)](https://www.nuget.org/packages/Dreamine.MVVM.Interfaces)
+[![Downloads](https://img.shields.io/nuget/dt/Dreamine.MVVM.Interfaces.svg)](https://www.nuget.org/packages/Dreamine.MVVM.Interfaces)
+[![Docs](https://img.shields.io/badge/Docs-dreamine.kr-2CA5E0)](https://dreamine.kr)
+[![Guide](https://img.shields.io/badge/Guide-dreamine.kr-2CA5E0)](https://dreamine.kr)
+[![Playground](https://img.shields.io/badge/Playground-dreamine.kr-7B2CBF)](https://dreamine.kr)
+[![Book](https://img.shields.io/badge/Book-Practical%20MVVM%20Architecture-black)](https://dreamine.kr)
 
 **Dreamine.MVVM.Interfaces** defines shared abstraction contracts used across the Dreamine MVVM framework.
 
@@ -278,7 +291,7 @@ Or add to your project file:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.4" />
+  <PackageReference Include="Dreamine.MVVM.Interfaces" Version="1.0.7" />
 </ItemGroup>
 ```
 
